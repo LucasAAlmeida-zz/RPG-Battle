@@ -32,14 +32,32 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (state == State.HeroesTurn) {
-            if (Input.GetKeyDown(KeyCode.Space)) {
-                state = State.Busy;
-                hero.Attack(enemy, () => {
-                    state = State.EnemiesTurn;
-                });
-            }
+        switch (state) {
+            case State.HeroesTurn:
+                HandleHeroesTurn();
+                break;
+            case State.EnemiesTurn:
+                HandleEnemiesTurn();
+                break;
         }
+    }
+
+    private void HandleHeroesTurn()
+    {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            state = State.Busy;
+            hero.Attack(enemy, () => {
+                state = State.EnemiesTurn;
+            });
+        }
+    }
+
+    private void HandleEnemiesTurn()
+    {
+        state = State.Busy;
+        enemy.Attack(hero, () => {
+            state = State.HeroesTurn;
+        });
     }
 
     private CharacterBattle SpawnCharacter(bool isHero)

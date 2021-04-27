@@ -17,8 +17,24 @@ public class CharacterAnimation : MonoBehaviour
         renderer.material = material;
     }
 
+    public void PlayIdleAnimation()
+    {
+        Debug.Log("Idle animation");
+    }
+
     public void PlayAttackAnimation(Vector3 attackDirection)
     {
         Debug.Log("Attack animation");
+    }
+
+    public void PlayMoveRightAnimation()
+    {
+        Debug.Log("Move right animation");
+    }
+
+    public void PlayMoveLeftAnimation()
+    {
+        Debug.Log("Move left animation");
+
     }
 }
