@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,10 +29,15 @@ public class BattleManager : MonoBehaviour
         enemy = SpawnCharacter(!isHero);
 
         state = State.HeroesTurn;
+        hero.ShowActiveHighlight(true);
     }
 
     private void Update()
     {
+        if (IsBattleOver()) {
+            return;
+        }
+
         switch (state) {
             case State.HeroesTurn:
                 HandleHeroesTurn();
@@ -42,12 +48,29 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private bool IsBattleOver()
+    {
+        if (hero.IsDead()) {
+            Debug.Log("Enemy wins!");
+            return true;
+        }
+
+        if (enemy.IsDead()) {
+            Debug.Log("Hero wins!");
+            return true;
+        }
+
+        return false;
+    }
+
     private void HandleHeroesTurn()
     {
         if (Input.GetKeyDown(KeyCode.Space)) {
             state = State.Busy;
             hero.Attack(enemy, () => {
+                hero.ShowActiveHighlight(false);
                 state = State.EnemiesTurn;
+                enemy.ShowActiveHighlight(true);
             });
         }
     }
@@ -56,7 +79,9 @@ public class BattleManager : MonoBehaviour
     {
         state = State.Busy;
         enemy.Attack(hero, () => {
+            enemy.ShowActiveHighlight(false);
             state = State.HeroesTurn;
+            hero.ShowActiveHighlight(true);
         });
     }
 

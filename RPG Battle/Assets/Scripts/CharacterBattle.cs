@@ -1,16 +1,18 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterBattle : MonoBehaviour
 {
-    CharacterAnimation characterAnimation;
+    private CharacterAnimation characterAnimation;
+    private GameObject activeHighlight;
 
     private State state;
     private Vector3 moveTargetPosition;
     private Action onMoveComplete;
-    private bool isHero;
+
+    private HealthManager healthManager;
+
+    [SerializeField] int damageAmount = 500;
 
     private enum State
     {
@@ -22,15 +24,17 @@ public class CharacterBattle : MonoBehaviour
     private void Awake()
     {
         characterAnimation = GetComponent<CharacterAnimation>();
-        state = State.Idle;
+        activeHighlight = transform.Find("ActiveHighlight").gameObject;
     }
 
     public void Setup(bool isHero)
     {
-        this.isHero = isHero;
+        state = State.Idle;
         var material = (isHero) ? AssetManager.Instance.hero1Material : AssetManager.Instance.enemy1Material;
         characterAnimation.SetMaterial(material);
         characterAnimation.PlayIdleAnimation();
+        ShowActiveHighlight(false);
+        healthManager = new HealthManager(1000);
     }
 
     private void Update()
@@ -57,6 +61,17 @@ public class CharacterBattle : MonoBehaviour
         return transform.position;
     }
 
+    private void TakeDamage(int damage)
+    {
+        healthManager.TakeDamate(damage);
+        Debug.Log("Health: " + healthManager.GetHealth());
+    }
+
+    public bool IsDead()
+    {
+        return healthManager.IsDead();
+    }
+
     public void Attack(CharacterBattle targetCharacterBattle, Action onAttackComplete)
     {
         var moveTargetPosition = targetCharacterBattle.GetPosition() + (GetPosition() - targetCharacterBattle.GetPosition()).normalized;
@@ -68,6 +83,7 @@ public class CharacterBattle : MonoBehaviour
             state = State.Busy;
             var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
             characterAnimation.PlayAttackAnimation(attackDirection);
+            targetCharacterBattle.TakeDamage(damageAmount);
 
             // Go back to starting position
             MoveToPosition(startingPosition, () => {
@@ -89,5 +105,10 @@ public class CharacterBattle : MonoBehaviour
         } else {
             characterAnimation.PlayMoveLeftAnimation();
         }
+    }
+
+    public void ShowActiveHighlight(bool option)
+    {
+        activeHighlight.SetActive(option);
     }
 }
