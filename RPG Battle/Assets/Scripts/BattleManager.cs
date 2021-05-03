@@ -7,8 +7,8 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] private Transform pfCharacterBattle;
 
-    [SerializeField] private Vector3 hero1Pos = new Vector3(5, 0.5f, 0);
-    [SerializeField] private Vector3 enemy1Pos = new Vector3(-5, 0.5f, 0);
+    private Vector3 hero1Pos = new Vector3(-5, 0.5f, 0);
+    private Vector3 enemy1Pos = new Vector3(5, 0.5f, 0);
 
     CharacterBattle hero;
     CharacterBattle enemy;
@@ -50,17 +50,7 @@ public class BattleManager : MonoBehaviour
 
     private bool IsBattleOver()
     {
-        if (hero.IsDead()) {
-            Debug.Log("Enemy wins!");
-            return true;
-        }
-
-        if (enemy.IsDead()) {
-            Debug.Log("Hero wins!");
-            return true;
-        }
-
-        return false;
+        return hero.IsDead() || enemy.IsDead();
     }
 
     private void HandleHeroesTurn()

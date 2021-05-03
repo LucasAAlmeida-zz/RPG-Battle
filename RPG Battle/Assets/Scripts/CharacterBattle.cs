@@ -5,6 +5,7 @@ public class CharacterBattle : MonoBehaviour
 {
     private CharacterAnimation characterAnimation;
     private GameObject activeHighlight;
+    private HealthBar healthBar;
 
     private State state;
     private Vector3 moveTargetPosition;
@@ -12,7 +13,7 @@ public class CharacterBattle : MonoBehaviour
 
     private HealthManager healthManager;
 
-    [SerializeField] int damageAmount = 500;
+    [SerializeField] int damageAmount = 400;
 
     private enum State
     {
@@ -25,12 +26,13 @@ public class CharacterBattle : MonoBehaviour
     {
         characterAnimation = GetComponent<CharacterAnimation>();
         activeHighlight = transform.Find("ActiveHighlight").gameObject;
+        healthBar = transform.Find("HealthBar").GetComponent<HealthBar>();
     }
 
     public void Setup(bool isHero)
     {
         state = State.Idle;
-        var material = (isHero) ? AssetManager.Instance.hero1Material : AssetManager.Instance.enemy1Material;
+        var material = (isHero) ? AssetManager.i.hero1Material : AssetManager.i.enemy1Material;
         characterAnimation.SetMaterial(material);
         characterAnimation.PlayIdleAnimation();
         ShowActiveHighlight(false);
@@ -64,7 +66,7 @@ public class CharacterBattle : MonoBehaviour
     private void TakeDamage(int damage)
     {
         healthManager.TakeDamate(damage);
-        Debug.Log("Health: " + healthManager.GetHealth());
+        healthBar.SetHealthPercent(healthManager.GetHealthPercent());
     }
 
     public bool IsDead()
@@ -84,6 +86,8 @@ public class CharacterBattle : MonoBehaviour
             var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
             characterAnimation.PlayAttackAnimation(attackDirection);
             targetCharacterBattle.TakeDamage(damageAmount);
+            bool isCritical = UnityEngine.Random.Range(0, 100) < 30;
+            DamagePopup.Create(targetCharacterBattle.GetPosition(), damageAmount, isCritical);
 
             // Go back to starting position
             MoveToPosition(startingPosition, () => {

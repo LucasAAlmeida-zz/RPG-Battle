@@ -338,8 +338,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.20412305, y: -0.43219173, z: 0.10110969, w: -0.8725371}
+  m_LocalPosition: {x: -7.7653313, y: 2.9087327, z: -6.046253}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -376,6 +376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hero1Material: {fileID: 2100000, guid: af2b082b8cf7f6244bf9a8c566858bc7, type: 2}
   enemy1Material: {fileID: 2100000, guid: 1f10b9cd105505847ac94f034a0de5d6, type: 2}
+  damagePopup: {fileID: 6846845099173093158, guid: 179e5d63c39273c47a72c7a759e00172, type: 3}
 --- !u!4 &1261766717
 Transform:
   m_ObjectHideFlags: 0
