@@ -4,7 +4,6 @@ using UnityEngine;
 public class CharacterBattle : MonoBehaviour
 {
     private CharacterAnimation characterAnimation;
-    private GameObject activeHighlight;
     private HealthBar healthBar;
 
     private State state;
@@ -15,6 +14,7 @@ public class CharacterBattle : MonoBehaviour
     private MeshRenderer meshRenderer;
 
     CharacterStats characterStats;
+    private bool turnSpent = false;
 
     private enum State
     {
@@ -26,7 +26,6 @@ public class CharacterBattle : MonoBehaviour
     private void Awake()
     {
         characterAnimation = GetComponent<CharacterAnimation>();
-        activeHighlight = transform.Find("ActiveHighlight").gameObject;
         healthBar = transform.Find("HealthBar").GetComponent<HealthBar>();
         meshRenderer = GetComponent<MeshRenderer>();
     }
@@ -38,7 +37,6 @@ public class CharacterBattle : MonoBehaviour
         meshRenderer.material.color = characterStats.color;
 
         characterAnimation.PlayIdleAnimation();
-        ShowActiveHighlight(false);
         healthManager = new HealthManager(characterStats.maxHealth);
     }
 
@@ -121,8 +119,20 @@ public class CharacterBattle : MonoBehaviour
         }
     }
 
-    public void ShowActiveHighlight(bool option)
+    public void SpendTurn()
     {
-        activeHighlight.SetActive(option);
+        meshRenderer.material.color = Color.gray;
+        turnSpent = true;
+    }
+
+    public bool IsTurnSpent()
+    {
+        return turnSpent;
+    }
+
+    public void RefreshTurn()
+    {
+        meshRenderer.material.color = characterStats.color;
+        turnSpent = false;
     }
 }

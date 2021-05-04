@@ -7,6 +7,8 @@ using System.Linq;
 public class BattleManager : MonoBehaviour
 {
     [SerializeField] private Transform pfCharacterBattle;
+    [SerializeField] private SelectionSpotlight heroSelectionSpotlight;
+    [SerializeField] private SelectionSpotlight enemySelectionSpotlight;
 
     CharacterBattle heroMiddle;
     CharacterBattle heroLeft;
@@ -14,6 +16,9 @@ public class BattleManager : MonoBehaviour
     CharacterBattle enemyMiddle;
     CharacterBattle enemyLeft;
     CharacterBattle enemyRight;
+
+    CharacterBattle selectedHero;
+    CharacterBattle selectedEnemy;
 
     private State state;
 
@@ -70,7 +75,9 @@ public class BattleManager : MonoBehaviour
         enemiesStats = enemiesStats.Where(h => h != enemyStat).ToArray();
 
         state = State.HeroesTurn;
-        heroMiddle.ShowActiveHighlight(true);
+
+        ChangeSelectedHeroUp();
+        ChangeSelectedEnemyUp();
     }
 
     private void Update()
@@ -96,24 +103,127 @@ public class BattleManager : MonoBehaviour
 
     private void HandleHeroesTurn()
     {
+        if (Input.GetKeyDown(KeyCode.W)) {
+            ChangeSelectedHeroUp();
+        }
+        if (Input.GetKeyDown(KeyCode.S)) {
+            ChangeSelectedHeroDown();
+        }
+        if (Input.GetKeyDown(KeyCode.A)) {
+            ChangeSelectedEnemyUp();
+        }
+        if (Input.GetKeyDown(KeyCode.D)) {
+            ChangeSelectedEnemyDown();
+        }
+
         if (Input.GetKeyDown(KeyCode.Space)) {
             state = State.Busy;
-            heroMiddle.Attack(enemyMiddle, () => {
-                heroMiddle.ShowActiveHighlight(false);
+            selectedHero.Attack(selectedEnemy, () => {
                 state = State.EnemiesTurn;
-                enemyMiddle.ShowActiveHighlight(true);
+                selectedHero.SpendTurn();
+                if (heroMiddle.IsTurnSpent() && heroLeft.IsTurnSpent() && heroRight.IsTurnSpent()) {
+                    heroMiddle.RefreshTurn();
+                    heroLeft.RefreshTurn();
+                    heroRight.RefreshTurn();
+                }
+                ChangeSelectedHeroUp();
             });
         }
     }
 
     private void HandleEnemiesTurn()
     {
+        CharacterBattle attackingEnemy = ChooseAttackingEnemy();
+        CharacterBattle attackedHero = ChooseAttackedHero();
+
         state = State.Busy;
-        enemyMiddle.Attack(heroMiddle, () => {
-            enemyMiddle.ShowActiveHighlight(false);
+        attackingEnemy.Attack(attackedHero, () => {
             state = State.HeroesTurn;
-            heroMiddle.ShowActiveHighlight(true);
+            attackingEnemy.SpendTurn();
+            if (enemyMiddle.IsTurnSpent() && enemyLeft.IsTurnSpent() && enemyRight.IsTurnSpent()) {
+                enemyMiddle.RefreshTurn();
+                enemyLeft.RefreshTurn();
+                enemyRight.RefreshTurn();
+            }
+            ChangeSelectedEnemyUp();
         });
+    }
+
+    private CharacterBattle ChooseAttackedHero()
+    {
+        var heroes = new CharacterBattle[3] { heroMiddle, heroLeft, heroRight };
+        var attackedHero = heroes[UnityEngine.Random.Range(0, 3)];
+        return attackedHero;
+    }
+
+    private CharacterBattle ChooseAttackingEnemy()
+    {
+        var enemies = new CharacterBattle[3] { enemyMiddle, enemyLeft, enemyRight };
+        CharacterBattle attackingEnemy;
+        do {
+            attackingEnemy = enemies[UnityEngine.Random.Range(0, 3)];
+        } while (attackingEnemy.IsTurnSpent());
+        return attackingEnemy;
+    }
+
+    private void ChangeSelectedHeroUp()
+    {
+        if (selectedHero == heroMiddle) {
+            selectedHero = heroLeft;
+        } else if (selectedHero == heroLeft) {
+            selectedHero = heroRight;
+        } else {
+            selectedHero = heroMiddle;
+        }
+
+        if (selectedHero.IsTurnSpent()) {
+            ChangeSelectedHeroUp();
+        } else {
+            heroSelectionSpotlight.SetTargetCharacter(selectedHero);
+        }
+    }
+
+    private void ChangeSelectedHeroDown()
+    {
+        if (selectedHero == heroMiddle) {
+            selectedHero = heroRight;
+        } else if (selectedHero == heroLeft) {
+            selectedHero = heroMiddle;
+        } else {
+            selectedHero = heroLeft;
+        }
+
+        if (selectedHero.IsTurnSpent()) {
+            ChangeSelectedHeroDown();
+        } else {
+            heroSelectionSpotlight.SetTargetCharacter(selectedHero);
+        }
+    }
+
+    private void ChangeSelectedEnemyUp()
+    {
+        if (selectedEnemy == enemyMiddle) {
+            selectedEnemy = enemyLeft;
+        } else if (selectedEnemy == enemyLeft) {
+            selectedEnemy = enemyRight;
+        } else {
+            selectedEnemy = enemyMiddle;
+        }
+
+        enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+    }
+
+    private void ChangeSelectedEnemyDown()
+    {
+        if (selectedEnemy == enemyMiddle) {
+            selectedEnemy = enemyRight;
+        } else if (selectedEnemy == enemyLeft) {
+            selectedEnemy = enemyMiddle;
+        } else {
+            selectedEnemy = enemyLeft;
+        }
+
+        enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
     }
 
     private CharacterBattle SpawnCharacter(Vector3 characterPosition, CharacterStats characterStats)
