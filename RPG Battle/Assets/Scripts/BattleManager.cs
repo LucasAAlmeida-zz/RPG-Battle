@@ -27,6 +27,7 @@ public class BattleManager : MonoBehaviour
         HeroesTurn,
         EnemiesTurn,
         Busy,
+        BattleEnded,
     }
 
     private void Start()
@@ -80,12 +81,16 @@ public class BattleManager : MonoBehaviour
         ChangeSelectedEnemyUp();
     }
 
+    private CharacterBattle SpawnCharacter(Vector3 characterPosition, CharacterStats characterStats)
+    {
+        var characterTransform = Instantiate(pfCharacterBattle, characterPosition, Quaternion.identity);
+        var characterBattle = characterTransform.GetComponent<CharacterBattle>();
+        characterBattle.Setup(characterStats);
+        return characterBattle;
+    }
+
     private void Update()
     {
-        if (IsBattleOver()) {
-            return;
-        }
-
         switch (state) {
             case State.HeroesTurn:
                 HandleHeroesTurn();
@@ -93,14 +98,12 @@ public class BattleManager : MonoBehaviour
             case State.EnemiesTurn:
                 HandleEnemiesTurn();
                 break;
+            case State.BattleEnded:
+                break;
         }
     }
 
-    private bool IsBattleOver()
-    {
-        return heroMiddle.IsDead() || enemyMiddle.IsDead();
-    }
-
+    #region Heroes Turn
     private void HandleHeroesTurn()
     {
         if (Input.GetKeyDown(KeyCode.W)) {
@@ -117,53 +120,13 @@ public class BattleManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Space)) {
-            state = State.Busy;
-            selectedHero.Attack(selectedEnemy, () => {
-                state = State.EnemiesTurn;
-                selectedHero.SpendTurn();
-                if (heroMiddle.IsTurnSpent() && heroLeft.IsTurnSpent() && heroRight.IsTurnSpent()) {
-                    heroMiddle.RefreshTurn();
-                    heroLeft.RefreshTurn();
-                    heroRight.RefreshTurn();
-                }
-                ChangeSelectedHeroUp();
-            });
-        }
-    }
-
-    private void HandleEnemiesTurn()
-    {
-        CharacterBattle attackingEnemy = ChooseAttackingEnemy();
-        CharacterBattle attackedHero = ChooseAttackedHero();
-
-        state = State.Busy;
-        attackingEnemy.Attack(attackedHero, () => {
-            state = State.HeroesTurn;
-            attackingEnemy.SpendTurn();
-            if (enemyMiddle.IsTurnSpent() && enemyLeft.IsTurnSpent() && enemyRight.IsTurnSpent()) {
-                enemyMiddle.RefreshTurn();
-                enemyLeft.RefreshTurn();
-                enemyRight.RefreshTurn();
+            if (selectedHero.IsAvailableToAct() && !selectedEnemy.IsDead()) {
+                state = State.Busy;
+                selectedHero.Attack(selectedEnemy, () => {
+                    OnHeroAttackComplete();
+                });
             }
-            ChangeSelectedEnemyUp();
-        });
-    }
-
-    private CharacterBattle ChooseAttackedHero()
-    {
-        var heroes = new CharacterBattle[3] { heroMiddle, heroLeft, heroRight };
-        var attackedHero = heroes[UnityEngine.Random.Range(0, 3)];
-        return attackedHero;
-    }
-
-    private CharacterBattle ChooseAttackingEnemy()
-    {
-        var enemies = new CharacterBattle[3] { enemyMiddle, enemyLeft, enemyRight };
-        CharacterBattle attackingEnemy;
-        do {
-            attackingEnemy = enemies[UnityEngine.Random.Range(0, 3)];
-        } while (attackingEnemy.IsTurnSpent());
-        return attackingEnemy;
+        }
     }
 
     private void ChangeSelectedHeroUp()
@@ -176,10 +139,10 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroMiddle;
         }
 
-        if (selectedHero.IsTurnSpent()) {
-            ChangeSelectedHeroUp();
-        } else {
+        if (selectedHero.IsAvailableToAct()) {
             heroSelectionSpotlight.SetTargetCharacter(selectedHero);
+        } else {
+            ChangeSelectedHeroUp();
         }
     }
 
@@ -193,10 +156,10 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroLeft;
         }
 
-        if (selectedHero.IsTurnSpent()) {
-            ChangeSelectedHeroDown();
-        } else {
+        if (selectedHero.IsAvailableToAct()) {
             heroSelectionSpotlight.SetTargetCharacter(selectedHero);
+        } else {
+            ChangeSelectedHeroDown();
         }
     }
 
@@ -210,7 +173,11 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyMiddle;
         }
 
-        enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+        if (!selectedEnemy.IsDead()) {
+            enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+        } else {
+            ChangeSelectedEnemyUp();
+        }
     }
 
     private void ChangeSelectedEnemyDown()
@@ -223,14 +190,92 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyLeft;
         }
 
-        enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+        if (!selectedEnemy.IsDead()) {
+            enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+        } else {
+            ChangeSelectedEnemyDown();
+        }
     }
 
-    private CharacterBattle SpawnCharacter(Vector3 characterPosition, CharacterStats characterStats)
+    private void OnHeroAttackComplete()
     {
-        var characterTransform = Instantiate(pfCharacterBattle, characterPosition, Quaternion.identity);
-        var characterBattle = characterTransform.GetComponent<CharacterBattle>();
-        characterBattle.Setup(characterStats);
-        return characterBattle;
+        selectedHero.SpendTurn();
+
+        if (enemyMiddle.IsDead() && enemyLeft.IsDead() && enemyRight.IsDead()) {
+            state = State.BattleEnded;
+            HandleBattleEnded();
+            return;
+        }
+
+        state = State.EnemiesTurn;
+        if (!enemyMiddle.IsAvailableToAct() && !enemyLeft.IsAvailableToAct() && !enemyRight.IsAvailableToAct()) {
+            enemyMiddle.TryRefreshTurn();
+            enemyLeft.TryRefreshTurn();
+            enemyRight.TryRefreshTurn();
+        }
+        heroSelectionSpotlight.gameObject.SetActive(false);
+        enemySelectionSpotlight.gameObject.SetActive(false);
+    }
+    #endregion
+
+    #region Enemies Turn
+    private void HandleEnemiesTurn()
+    {
+        CharacterBattle attackingEnemy = ChooseAttackingEnemy();
+        CharacterBattle attackedHero = ChooseAttackedHero();
+
+        state = State.Busy;
+        attackingEnemy.Attack(attackedHero, () => {
+            OnEnemyAttackComplete(attackingEnemy);
+        });
+    }
+
+    private CharacterBattle ChooseAttackingEnemy()
+    {
+        var enemies = new CharacterBattle[3] { enemyMiddle, enemyLeft, enemyRight };
+        CharacterBattle attackingEnemy;
+        do {
+            attackingEnemy = enemies[UnityEngine.Random.Range(0, 3)];
+        } while (!attackingEnemy.IsAvailableToAct());
+        return attackingEnemy;
+    }
+
+    private CharacterBattle ChooseAttackedHero()
+    {
+        var heroes = new CharacterBattle[3] { heroMiddle, heroLeft, heroRight };
+        CharacterBattle attackedHero;
+
+        do {
+            attackedHero = heroes[UnityEngine.Random.Range(0, 3)];
+        } while (attackedHero.IsDead());
+        return attackedHero;
+    }
+
+    private void OnEnemyAttackComplete(CharacterBattle attackingEnemy)
+    {
+        attackingEnemy.SpendTurn();
+
+        if (heroMiddle.IsDead() && heroLeft.IsDead() && heroRight.IsDead()) {
+            state = State.BattleEnded;
+            HandleBattleEnded();
+            return;
+        }
+
+        state = State.HeroesTurn;
+        if (!heroMiddle.IsAvailableToAct() && !heroLeft.IsAvailableToAct() && !heroRight.IsAvailableToAct()) {
+            heroMiddle.TryRefreshTurn();
+            heroLeft.TryRefreshTurn();
+            heroRight.TryRefreshTurn();
+        }
+        ChangeSelectedHeroUp();
+
+        heroSelectionSpotlight.gameObject.SetActive(true);
+        enemySelectionSpotlight.gameObject.SetActive(true);
+    }
+    #endregion
+
+    private void HandleBattleEnded()
+    {
+        Debug.Log("Battle Ended");
     }
 }

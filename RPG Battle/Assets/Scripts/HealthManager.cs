@@ -51,6 +51,6 @@ public class HealthManager
 
     public bool IsDead()
     {
-        return health == 0;
+        return health <= 0;
     }
 }

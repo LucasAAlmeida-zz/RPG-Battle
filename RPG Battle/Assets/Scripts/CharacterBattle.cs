@@ -68,6 +68,11 @@ public class CharacterBattle : MonoBehaviour
     {
         healthManager.TakeDamate(damage);
         healthBar.SetHealthPercent(healthManager.GetHealthPercent());
+
+        if (IsDead()) {
+            meshRenderer.material.color = Color.grey;
+            transform.Translate(Vector3.down * 0.5f);
+        }
     }
 
     public bool IsDead()
@@ -76,35 +81,43 @@ public class CharacterBattle : MonoBehaviour
     }
 
     public void Attack(CharacterBattle targetCharacterBattle, Action onAttackComplete)
-    {
+    {        
         var moveTargetPosition = targetCharacterBattle.GetPosition() + (GetPosition() - targetCharacterBattle.GetPosition()).normalized;
         var startingPosition = GetPosition();
 
         //Go to enemy position
-        MoveToPosition(moveTargetPosition, () => {
+        this.MoveToPosition(moveTargetPosition, () => {
             //Arrived at enemy, attack animation
             state = State.Busy;
+
             var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
             characterAnimation.PlayAttackAnimation(attackDirection);
 
-            bool hasHit = UnityEngine.Random.Range(0, 100) < characterStats.accuracy;
-            if (hasHit) {
-                var damage = (int) UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
-                targetCharacterBattle.TakeDamage(damage);
-                bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
-                DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
-            } else {
-                DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
-            }
+            HandleHit(targetCharacterBattle);
 
             // Go back to starting position
             MoveToPosition(startingPosition, () => {
                 // Went back, back to idle
                 state = State.Idle;
+
                 characterAnimation.PlayIdleAnimation();
                 onAttackComplete();
             });
         });
+    }
+
+    private void HandleHit(CharacterBattle targetCharacterBattle)
+    {
+        bool hasHit = UnityEngine.Random.Range(0, 100) < characterStats.accuracy;
+        if (hasHit) {
+            var damage = (int)UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
+            bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
+            damage = (int) ((isCritical) ? damage * 1.5 : damage);
+            targetCharacterBattle.TakeDamage(damage);
+            DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
+        } else {
+            DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
+        }
     }
 
     private void MoveToPosition(Vector3 moveTargetPosition, Action onMoveComplete)
@@ -125,14 +138,16 @@ public class CharacterBattle : MonoBehaviour
         turnSpent = true;
     }
 
-    public bool IsTurnSpent()
+    public bool IsAvailableToAct()
     {
-        return turnSpent;
+        return !turnSpent && !IsDead();
     }
 
-    public void RefreshTurn()
+    public void TryRefreshTurn()
     {
-        meshRenderer.material.color = characterStats.color;
-        turnSpent = false;
+        if (!IsDead()) {
+            meshRenderer.material.color = characterStats.color;
+            turnSpent = false;
+        }
     }
 }
