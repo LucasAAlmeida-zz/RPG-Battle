@@ -397,7 +397,7 @@ Transform:
   m_GameObject: {fileID: 1968663075117345933}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.3, z: 1}
   m_Children:
   - {fileID: 1968663074621519871}
   - {fileID: 1968663073675006891}
@@ -490,6 +490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f43685744ec84cb4d6f2791919ebe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 1000
   damageAmount: 400
 --- !u!33 &6127223571279444659
 MeshFilter:

@@ -5,7 +5,7 @@ using TMPro;
 
 public class DamagePopup : MonoBehaviour
 {
-    public static void Create(Vector3 position, int damage, bool isCritical)
+    public static void Create(Vector3 position, string damage, bool isCritical = false)
     {
         var damagePopupTransform = Instantiate(AssetManager.i.damagePopup, position, Quaternion.identity);
         var damagePopupScript = damagePopupTransform.GetComponent<DamagePopup>();
@@ -21,9 +21,9 @@ public class DamagePopup : MonoBehaviour
         textMesh = GetComponent<TextMeshPro>();
     }
 
-    public void Setup(int damage, bool isCritical)
+    public void Setup(string damage, bool isCritical)
     {
-        textMesh.SetText(damage.ToString());
+        textMesh.SetText(damage);
 
         textMesh.fontSize = 10;
         textMesh.color = Color.yellow;

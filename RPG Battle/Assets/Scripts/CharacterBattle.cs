@@ -12,8 +12,9 @@ public class CharacterBattle : MonoBehaviour
     private Action onMoveComplete;
 
     private HealthManager healthManager;
+    private MeshRenderer meshRenderer;
 
-    [SerializeField] int damageAmount = 400;
+    CharacterStats characterStats;
 
     private enum State
     {
@@ -27,16 +28,18 @@ public class CharacterBattle : MonoBehaviour
         characterAnimation = GetComponent<CharacterAnimation>();
         activeHighlight = transform.Find("ActiveHighlight").gameObject;
         healthBar = transform.Find("HealthBar").GetComponent<HealthBar>();
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
-    public void Setup(bool isHero)
+    public void Setup(CharacterStats characterStats)
     {
         state = State.Idle;
-        var material = (isHero) ? AssetManager.i.hero1Material : AssetManager.i.enemy1Material;
-        characterAnimation.SetMaterial(material);
+        this.characterStats = characterStats;
+        meshRenderer.material.color = characterStats.color;
+
         characterAnimation.PlayIdleAnimation();
         ShowActiveHighlight(false);
-        healthManager = new HealthManager(1000);
+        healthManager = new HealthManager(characterStats.maxHealth);
     }
 
     private void Update()
@@ -85,9 +88,16 @@ public class CharacterBattle : MonoBehaviour
             state = State.Busy;
             var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
             characterAnimation.PlayAttackAnimation(attackDirection);
-            targetCharacterBattle.TakeDamage(damageAmount);
-            bool isCritical = UnityEngine.Random.Range(0, 100) < 30;
-            DamagePopup.Create(targetCharacterBattle.GetPosition(), damageAmount, isCritical);
+
+            bool hasHit = UnityEngine.Random.Range(0, 100) < characterStats.accuracy;
+            if (hasHit) {
+                var damage = (int) UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
+                targetCharacterBattle.TakeDamage(damage);
+                bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
+                DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
+            } else {
+                DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
+            }
 
             // Go back to starting position
             MoveToPosition(startingPosition, () => {
