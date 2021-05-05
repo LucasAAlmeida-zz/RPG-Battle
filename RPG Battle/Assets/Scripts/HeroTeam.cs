@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -76,5 +77,10 @@ public class HeroTeam : MonoBehaviour
     public List<CharacterStats> GetHeroTeam()
     {
         return heroTeam;
+    }
+
+    public void SelfDestroy()
+    {
+        Destroy(gameObject);
     }
 }

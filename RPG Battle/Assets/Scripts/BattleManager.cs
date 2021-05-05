@@ -9,6 +9,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Transform pfCharacterBattle;
     [SerializeField] private SelectionSpotlight heroSelectionSpotlight;
     [SerializeField] private SelectionSpotlight enemySelectionSpotlight;
+    [SerializeField] private GameObject battleResultsWindow;
 
     CharacterBattle heroMiddle;
     CharacterBattle heroLeft;
@@ -69,7 +70,10 @@ public class BattleManager : MonoBehaviour
 
     private List<CharacterStats> GetHeroTeamStats()
     {
-        return HeroTeam.i.GetHeroTeam() ?? CreateRandomHeroTeam();
+        if (HeroTeam.i != null) {
+            return HeroTeam.i.GetHeroTeam();
+        }
+        return CreateRandomHeroTeam();
     }
 
     private List<CharacterStats> CreateRandomHeroTeam()
@@ -237,7 +241,8 @@ public class BattleManager : MonoBehaviour
 
         if (enemyMiddle.IsDead() && enemyLeft.IsDead() && enemyRight.IsDead()) {
             state = State.BattleEnded;
-            HandleBattleEnded();
+            bool haveHeroesWon = true;
+            HandleBattleEnded(haveHeroesWon);
             return;
         }
 
@@ -291,7 +296,8 @@ public class BattleManager : MonoBehaviour
 
         if (heroMiddle.IsDead() && heroLeft.IsDead() && heroRight.IsDead()) {
             state = State.BattleEnded;
-            HandleBattleEnded();
+            bool haveHeroesWon = false;
+            HandleBattleEnded(haveHeroesWon);
             return;
         }
 
@@ -308,8 +314,9 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
-    private void HandleBattleEnded()
+    private void HandleBattleEnded(bool haveHeroesWon)
     {
-        Debug.Log("Battle Ended");
+        battleResultsWindow.GetComponent<BattleResultsWindow>().ChangeBattleResultsText(haveHeroesWon);
+        battleResultsWindow.SetActive(true);
     }
 }
