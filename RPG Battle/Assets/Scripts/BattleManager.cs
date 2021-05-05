@@ -32,12 +32,60 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        var heroesStats = new CharacterStats[4] { 
+        SpawnHeroTeam();
+        SpawnEnemyTeam();
+
+        state = State.HeroesTurn;
+
+        ChangeSelectedHeroUp();
+        ChangeSelectedEnemyUp();
+    }
+
+    private void SpawnEnemyTeam()
+    {
+        var enemyTeamStats = CreateRandomEnemyTeam();
+
+        var enemyMiddlePos = new Vector3(5, 0.5f, 0);
+        var enemyLeftPos = new Vector3(6, 0.5f, 5);
+        var enemyRightPos = new Vector3(6, 0.5f, -5);
+
+        enemyMiddle = SpawnCharacter(enemyMiddlePos, enemyTeamStats[0]);
+        enemyLeft = SpawnCharacter(enemyLeftPos, enemyTeamStats[1]);
+        enemyRight = SpawnCharacter(enemyRightPos, enemyTeamStats[2]);
+    }
+
+    private void SpawnHeroTeam()
+    {
+        var heroTeamStats = GetHeroTeamStats();
+
+        var heroMiddlePos = new Vector3(-5, 0.5f, 0);
+        var heroLeftPos = new Vector3(-6, 0.5f, 5);
+        var heroRightPos = new Vector3(-6, 0.5f, -5);
+
+        heroMiddle = SpawnCharacter(heroMiddlePos, heroTeamStats[0]);
+        heroLeft = SpawnCharacter(heroLeftPos, heroTeamStats[1]);
+        heroRight = SpawnCharacter(heroRightPos, heroTeamStats[2]);
+    }
+
+    private List<CharacterStats> GetHeroTeamStats()
+    {
+        return HeroTeam.i.GetHeroTeam() ?? CreateRandomHeroTeam();
+    }
+
+    private List<CharacterStats> CreateRandomHeroTeam()
+    {
+        var heroesStats = new CharacterStats[4] {
             Resources.Load("CharacterStats/Heroes/Hero1") as CharacterStats,
             Resources.Load("CharacterStats/Heroes/Hero2") as CharacterStats,
             Resources.Load("CharacterStats/Heroes/Hero3") as CharacterStats,
             Resources.Load("CharacterStats/Heroes/HeroBoss") as CharacterStats,
         };
+
+        return CreateRandomTeam(heroesStats);
+    }
+
+    private List<CharacterStats> CreateRandomEnemyTeam()
+    {
         var enemiesStats = new CharacterStats[4] {
             Resources.Load("CharacterStats/Enemies/Enemy1") as CharacterStats,
             Resources.Load("CharacterStats/Enemies/Enemy2") as CharacterStats,
@@ -45,40 +93,26 @@ public class BattleManager : MonoBehaviour
             Resources.Load("CharacterStats/Enemies/EnemyBoss") as CharacterStats,
         };
 
-        var heroMiddlePos = new Vector3(-5, 0.5f, 0);
-        var heroStat = heroesStats[UnityEngine.Random.Range(0, 4)];
-        heroMiddle = SpawnCharacter(heroMiddlePos, heroStat);
-        heroesStats = heroesStats.Where(h => h != heroStat).ToArray();
+        return CreateRandomTeam(enemiesStats);
+    }
 
-        var heroLeftPos = new Vector3(-6, 0.5f, 5);
-        heroStat = heroesStats[UnityEngine.Random.Range(0, 3)];
-        heroLeft = SpawnCharacter(heroLeftPos, heroStat);
-        heroesStats = heroesStats.Where(h => h != heroStat).ToArray();
+    private static List<CharacterStats> CreateRandomTeam(CharacterStats[] characterStatsList)
+    {
+        var heroTeam = new List<CharacterStats>();
 
-        var heroRightPos = new Vector3(-6, 0.5f, -5);
-        heroStat = heroesStats[UnityEngine.Random.Range(0, 2)];
-        heroRight = SpawnCharacter(heroRightPos, heroStat);
-        heroesStats = heroesStats.Where(h => h != heroStat).ToArray();
+        var heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
+        heroTeam.Add(heroStat);
 
-        var enemyMiddlePos = new Vector3(5, 0.5f, 0);
-        var enemyStat = enemiesStats[UnityEngine.Random.Range(0, 4)];
-        enemyMiddle = SpawnCharacter(enemyMiddlePos, enemyStat);
-        enemiesStats = enemiesStats.Where(h => h != enemyStat).ToArray();
+        heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
+        heroTeam.Add(heroStat);
 
-        var enemyLeftPos = new Vector3(6, 0.5f, 5);
-        enemyStat = enemiesStats[UnityEngine.Random.Range(0, 3)];
-        enemyLeft = SpawnCharacter(enemyLeftPos, enemyStat);
-        enemiesStats = enemiesStats.Where(h => h != enemyStat).ToArray();
+        heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
+        heroTeam.Add(heroStat);
 
-        var enemyRightPos = new Vector3(6, 0.5f, -5);
-        enemyStat = enemiesStats[UnityEngine.Random.Range(0, 2)];
-        enemyRight = SpawnCharacter(enemyRightPos, enemyStat);
-        enemiesStats = enemiesStats.Where(h => h != enemyStat).ToArray();
-
-        state = State.HeroesTurn;
-
-        ChangeSelectedHeroUp();
-        ChangeSelectedEnemyUp();
+        return heroTeam;
     }
 
     private CharacterBattle SpawnCharacter(Vector3 characterPosition, CharacterStats characterStats)

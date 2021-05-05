@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class SelectTeamWindow : MonoBehaviour
 {
@@ -11,45 +12,26 @@ public class SelectTeamWindow : MonoBehaviour
     [SerializeField] private TextMeshProUGUI critChanceText;
     [SerializeField] private TextMeshProUGUI accuracyText;
 
+    [SerializeField] private GameObject redHeroPositionTextGameObject;
+    [SerializeField] private GameObject greenHeroPositionTextGameObject;
+    [SerializeField] private GameObject blueHeroPositionTextGameObject;
+    [SerializeField] private GameObject whiteHeroPositionTextGameObject;
+
     public void RedHeroButtonMouseEnter()
     {
-        var redHeroStats = Resources.Load("CharacterStats/Heroes/Hero1") as CharacterStats;
-        DisplayHeroStats(redHeroStats);
+        DisplayHeroStats(HeroTeam.i.GetRedHeroStats());
     }
-
     public void GreenHeroButtonMouseEnter()
     {
-        var greenHeroStats = Resources.Load("CharacterStats/Heroes/Hero2") as CharacterStats;
-        DisplayHeroStats(greenHeroStats);
+        DisplayHeroStats(HeroTeam.i.GetGreenHeroStats());
     }
-
     public void BlueHeroButtonMouseEnter()
     {
-        var blueHeroStats = Resources.Load("CharacterStats/Heroes/Hero3") as CharacterStats;
-        DisplayHeroStats(blueHeroStats);
+        DisplayHeroStats(HeroTeam.i.GetBlueHeroStats());
     }
-
-    public void HeroBossButtonMouseEnter()
+    public void WhiteHeroButtonMouseEnter()
     {
-        var heroBossStats = Resources.Load("CharacterStats/Heroes/HeroBoss") as CharacterStats;
-        DisplayHeroStats(heroBossStats);
-    }
-
-    public void RedHeroClicked()
-    {
-        Debug.Log("Hero clicked");
-    }
-    public void GreenHeroClicked()
-    {
-        Debug.Log("Hero clicked");
-    }
-    public void BlueHeroClicked()
-    {
-        Debug.Log("Hero clicked");
-    }
-    public void HeroBossClicked()
-    {
-        Debug.Log("Hero clicked");
+        DisplayHeroStats(HeroTeam.i.GetWhiteHeroStats());
     }
 
     private void DisplayHeroStats(CharacterStats heroStats)
@@ -59,5 +41,39 @@ public class SelectTeamWindow : MonoBehaviour
         powerText.text = "Power: " + heroStats.power.ToString();
         critChanceText.text = "Crit Chance: " + heroStats.critChance.ToString();
         accuracyText.text = "Accuracy: " + heroStats.accuracy.ToString();
+    }
+
+    public void RedHeroClicked()
+    {
+        if (!redHeroPositionTextGameObject.activeSelf) {
+            var position = HeroTeam.i.AddRedCharacterToTeam();
+            redHeroPositionTextGameObject.SetActive(true);
+            redHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+        }
+        
+    }
+    public void GreenHeroClicked()
+    {
+        if (!greenHeroPositionTextGameObject.activeSelf) {
+            var position = HeroTeam.i.AddGreenCharacterToTeam();
+            greenHeroPositionTextGameObject.SetActive(true);
+            greenHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+        }
+    }
+    public void BlueHeroClicked()
+    {
+        if (!blueHeroPositionTextGameObject.activeSelf) {
+            var position = HeroTeam.i.AddBlueCharacterToTeam();
+            blueHeroPositionTextGameObject.SetActive(true);
+            blueHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+        }
+    }
+    public void WhiteHeroClicked()
+    {
+        if (!whiteHeroPositionTextGameObject.activeSelf) {
+            var position = HeroTeam.i.AddWhiteCharacterToTeam();
+            whiteHeroPositionTextGameObject.SetActive(true);
+            whiteHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+        }
     }
 }

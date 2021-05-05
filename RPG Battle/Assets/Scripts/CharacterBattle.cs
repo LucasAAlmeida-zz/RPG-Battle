@@ -40,6 +40,11 @@ public class CharacterBattle : MonoBehaviour
         healthManager = new HealthManager(characterStats.maxHealth);
     }
 
+    public CharacterStats GetCharacterStats()
+    {
+        return characterStats;
+    }
+
     private void Update()
     {
         switch(state) {
