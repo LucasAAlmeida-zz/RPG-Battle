@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class CharacterBattle : MonoBehaviour
 {
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip moveAudioClip;
+    [SerializeField] private AudioClip attackMissAudioClip;
+    [SerializeField] private AudioClip attackNormalAudioClip;
+    [SerializeField] private AudioClip attackCritAudioClip;
+    [SerializeField] private AudioClip dieAudioClip;
+
     private CharacterAnimation characterAnimation;
     private HealthBar healthBar;
 
@@ -28,6 +35,7 @@ public class CharacterBattle : MonoBehaviour
         characterAnimation = GetComponent<CharacterAnimation>();
         healthBar = transform.Find("HealthBar").GetComponent<HealthBar>();
         meshRenderer = GetComponent<MeshRenderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Setup(CharacterStats characterStats)
@@ -38,11 +46,6 @@ public class CharacterBattle : MonoBehaviour
 
         characterAnimation.PlayIdleAnimation();
         healthManager = new HealthManager(characterStats.maxHealth);
-    }
-
-    public CharacterStats GetCharacterStats()
-    {
-        return characterStats;
     }
 
     private void Update()
@@ -75,6 +78,8 @@ public class CharacterBattle : MonoBehaviour
         healthBar.SetHealthPercent(healthManager.GetHealthPercent());
 
         if (IsDead()) {
+            audioSource.PlayOneShot(dieAudioClip);
+
             meshRenderer.material.color = Color.grey;
             transform.Translate(Vector3.down * 0.5f);
         }
@@ -94,11 +99,7 @@ public class CharacterBattle : MonoBehaviour
         this.MoveToPosition(moveTargetPosition, () => {
             //Arrived at enemy, attack animation
             state = State.Busy;
-
-            var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
-            characterAnimation.PlayAttackAnimation(attackDirection);
-
-            HandleHit(targetCharacterBattle);
+            HandleAttack(targetCharacterBattle);
 
             // Go back to starting position
             MoveToPosition(startingPosition, () => {
@@ -111,22 +112,35 @@ public class CharacterBattle : MonoBehaviour
         });
     }
 
-    private void HandleHit(CharacterBattle targetCharacterBattle)
+    private void HandleAttack(CharacterBattle targetCharacterBattle)
     {
+        var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
+        characterAnimation.PlayAttackAnimation(attackDirection);
+
         bool hasHit = UnityEngine.Random.Range(0, 100) < characterStats.accuracy;
-        if (hasHit) {
-            var damage = (int)UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
-            bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
-            damage = (int) ((isCritical) ? damage * 1.5 : damage);
-            targetCharacterBattle.TakeDamage(damage);
-            DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
-        } else {
+
+        if (!hasHit) {
+            audioSource.PlayOneShot(attackMissAudioClip);
             DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
+            return;
         }
+
+        var damage = (int)UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
+        bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
+        if (!isCritical) {
+            audioSource.PlayOneShot(attackNormalAudioClip);
+        } else {
+            audioSource.PlayOneShot(attackCritAudioClip);
+            damage = (int)(damage * 1.5);
+        }
+        targetCharacterBattle.TakeDamage(damage);
+        DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
     }
 
     private void MoveToPosition(Vector3 moveTargetPosition, Action onMoveComplete)
     {
+        audioSource.PlayOneShot(moveAudioClip);
+
         this.moveTargetPosition = moveTargetPosition;
         this.onMoveComplete = onMoveComplete;
         state = State.Moving;

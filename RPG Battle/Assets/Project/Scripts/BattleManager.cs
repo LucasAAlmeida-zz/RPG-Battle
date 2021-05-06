@@ -42,19 +42,9 @@ public class BattleManager : MonoBehaviour
         ChangeSelectedEnemyUp();
     }
 
-    private void SpawnEnemyTeam()
-    {
-        var enemyTeamStats = CreateRandomEnemyTeam();
+    #region Spawn Characters
 
-        var enemyMiddlePos = new Vector3(5, 0.5f, 0);
-        var enemyLeftPos = new Vector3(6, 0.5f, 5);
-        var enemyRightPos = new Vector3(6, 0.5f, -5);
-
-        enemyMiddle = SpawnCharacter(enemyMiddlePos, enemyTeamStats[0]);
-        enemyLeft = SpawnCharacter(enemyLeftPos, enemyTeamStats[1]);
-        enemyRight = SpawnCharacter(enemyRightPos, enemyTeamStats[2]);
-    }
-
+    #region Spawn Hero Team
     private void SpawnHeroTeam()
     {
         var heroTeamStats = GetHeroTeamStats();
@@ -67,7 +57,6 @@ public class BattleManager : MonoBehaviour
         heroLeft = SpawnCharacter(heroLeftPos, heroTeamStats[1]);
         heroRight = SpawnCharacter(heroRightPos, heroTeamStats[2]);
     }
-
     private List<CharacterStats> GetHeroTeamStats()
     {
         if (HeroTeam.i != null) {
@@ -75,7 +64,6 @@ public class BattleManager : MonoBehaviour
         }
         return CreateRandomHeroTeam();
     }
-
     private List<CharacterStats> CreateRandomHeroTeam()
     {
         var heroesStats = new CharacterStats[4] {
@@ -87,7 +75,21 @@ public class BattleManager : MonoBehaviour
 
         return CreateRandomTeam(heroesStats);
     }
+    #endregion
 
+    #region Spawn EnemyTeam
+    private void SpawnEnemyTeam()
+    {
+        var enemyTeamStats = CreateRandomEnemyTeam();
+
+        var enemyMiddlePos = new Vector3(5, 0.5f, 0);
+        var enemyLeftPos = new Vector3(6, 0.5f, 5);
+        var enemyRightPos = new Vector3(6, 0.5f, -5);
+
+        enemyMiddle = SpawnCharacter(enemyMiddlePos, enemyTeamStats[0]);
+        enemyLeft = SpawnCharacter(enemyLeftPos, enemyTeamStats[1]);
+        enemyRight = SpawnCharacter(enemyRightPos, enemyTeamStats[2]);
+    }
     private List<CharacterStats> CreateRandomEnemyTeam()
     {
         var enemiesStats = new CharacterStats[4] {
@@ -99,24 +101,25 @@ public class BattleManager : MonoBehaviour
 
         return CreateRandomTeam(enemiesStats);
     }
+    #endregion
 
     private static List<CharacterStats> CreateRandomTeam(CharacterStats[] characterStatsList)
     {
-        var heroTeam = new List<CharacterStats>();
+        var characterTeam = new List<CharacterStats>();
 
-        var heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
-        heroTeam.Add(heroStat);
+        var characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterTeam.Add(characterStats);
 
-        heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
-        heroTeam.Add(heroStat);
+        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterTeam.Add(characterStats);
 
-        heroStat = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != heroStat).ToArray();
-        heroTeam.Add(heroStat);
+        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
+        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterTeam.Add(characterStats);
 
-        return heroTeam;
+        return characterTeam;
     }
 
     private CharacterBattle SpawnCharacter(Vector3 characterPosition, CharacterStats characterStats)
@@ -126,6 +129,8 @@ public class BattleManager : MonoBehaviour
         characterBattle.Setup(characterStats);
         return characterBattle;
     }
+
+    #endregion
 
     private void Update()
     {
@@ -177,11 +182,7 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroMiddle;
         }
 
-        if (selectedHero.IsAvailableToAct()) {
-            heroSelectionSpotlight.SetTargetCharacter(selectedHero);
-        } else {
-            ChangeSelectedHeroUp();
-        }
+        ValidateSelectedHero();
     }
 
     private void ChangeSelectedHeroDown()
@@ -194,11 +195,17 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroLeft;
         }
 
-        if (selectedHero.IsAvailableToAct()) {
-            heroSelectionSpotlight.SetTargetCharacter(selectedHero);
-        } else {
-            ChangeSelectedHeroDown();
+        ValidateSelectedHero();
+    }
+
+    private void ValidateSelectedHero()
+    {
+        if (!selectedHero.IsAvailableToAct()) {
+            ChangeSelectedHeroUp();
+            return;
         }
+
+        heroSelectionSpotlight.SetTargetCharacter(selectedHero);
     }
 
     private void ChangeSelectedEnemyUp()
@@ -211,11 +218,7 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyMiddle;
         }
 
-        if (!selectedEnemy.IsDead()) {
-            enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
-        } else {
-            ChangeSelectedEnemyUp();
-        }
+        ValidateSelectedEnemy();
     }
 
     private void ChangeSelectedEnemyDown()
@@ -228,11 +231,17 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyLeft;
         }
 
-        if (!selectedEnemy.IsDead()) {
-            enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
-        } else {
-            ChangeSelectedEnemyDown();
+        ValidateSelectedEnemy();
+    }
+
+    private void ValidateSelectedEnemy()
+    {
+        if (selectedEnemy.IsDead()) {
+            ChangeSelectedEnemyUp();
+            return;
         }
+
+        enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
     }
 
     private void OnHeroAttackComplete()

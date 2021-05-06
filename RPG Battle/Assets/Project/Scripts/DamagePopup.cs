@@ -5,7 +5,7 @@ using TMPro;
 
 public class DamagePopup : MonoBehaviour
 {
-    public static void Create(Vector3 position, string damage, bool isCritical = false)
+    public static void Create(Vector3 position, string damage, bool isCritical = true)
     {
         var damagePopupTransform = Instantiate(AssetManager.i.damagePopup, position, Quaternion.identity);
         var damagePopupScript = damagePopupTransform.GetComponent<DamagePopup>();

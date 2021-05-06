@@ -4,8 +4,16 @@ using UnityEngine;
 
 public class SelectionSpotlight : MonoBehaviour
 {
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip selectionChangedAudioClip;
+
     Vector3 targetPosition;
     float translateSpeed = 10f;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     // Update is called once per frame
     private void Update()
@@ -20,6 +28,8 @@ public class SelectionSpotlight : MonoBehaviour
 
     public void SetTargetCharacter(CharacterBattle characterBattle)
     {
+        audioSource.PlayOneShot(selectionChangedAudioClip);
+
         targetPosition = characterBattle.transform.position;
         targetPosition.y += 5; 
     }

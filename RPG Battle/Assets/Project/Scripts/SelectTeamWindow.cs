@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class SelectTeamWindow : MonoBehaviour
 {
+    private AudioSource audioSource;
+
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI maxHealthText;
     [SerializeField] private TextMeshProUGUI powerText;
@@ -16,6 +18,14 @@ public class SelectTeamWindow : MonoBehaviour
     [SerializeField] private GameObject greenHeroPositionTextGameObject;
     [SerializeField] private GameObject blueHeroPositionTextGameObject;
     [SerializeField] private GameObject whiteHeroPositionTextGameObject;
+
+    [SerializeField] private AudioClip showHeroStatsAudioClip;
+    [SerializeField] private AudioClip heroSelectedAudioClip;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     public void RedHeroButtonMouseEnter()
     {
@@ -41,14 +51,15 @@ public class SelectTeamWindow : MonoBehaviour
         powerText.text = "Power: " + heroStats.power.ToString();
         critChanceText.text = "Crit Chance: " + heroStats.critChance.ToString();
         accuracyText.text = "Accuracy: " + heroStats.accuracy.ToString();
+
+        audioSource.PlayOneShot(showHeroStatsAudioClip);
     }
 
     public void RedHeroClicked()
     {
         if (!redHeroPositionTextGameObject.activeSelf) {
             var position = HeroTeam.i.AddRedCharacterToTeam();
-            redHeroPositionTextGameObject.SetActive(true);
-            redHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+            HeroSelected(redHeroPositionTextGameObject, position);
         }
         
     }
@@ -56,24 +67,29 @@ public class SelectTeamWindow : MonoBehaviour
     {
         if (!greenHeroPositionTextGameObject.activeSelf) {
             var position = HeroTeam.i.AddGreenCharacterToTeam();
-            greenHeroPositionTextGameObject.SetActive(true);
-            greenHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+            HeroSelected(greenHeroPositionTextGameObject, position);
         }
     }
+
     public void BlueHeroClicked()
     {
         if (!blueHeroPositionTextGameObject.activeSelf) {
             var position = HeroTeam.i.AddBlueCharacterToTeam();
-            blueHeroPositionTextGameObject.SetActive(true);
-            blueHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+            HeroSelected(blueHeroPositionTextGameObject, position);
         }
     }
     public void WhiteHeroClicked()
     {
         if (!whiteHeroPositionTextGameObject.activeSelf) {
             var position = HeroTeam.i.AddWhiteCharacterToTeam();
-            whiteHeroPositionTextGameObject.SetActive(true);
-            whiteHeroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+            HeroSelected(whiteHeroPositionTextGameObject, position);
         }
+    }
+
+    private void HeroSelected(GameObject heroPositionTextGameObject, int position)
+    {
+        heroPositionTextGameObject.SetActive(true);
+        heroPositionTextGameObject.GetComponent<Text>().text = position.ToString();
+        audioSource.PlayOneShot(heroSelectedAudioClip);
     }
 }
