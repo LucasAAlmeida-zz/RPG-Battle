@@ -183,7 +183,12 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroMiddle;
         }
 
-        ValidateSelectedHero();
+        if (!selectedHero.IsAvailableToAct()) {
+            ChangeSelectedHeroUp();
+            return;
+        }
+
+        UpdateHeroSpotlightTargetAndStatsInfo();
     }
 
     private void ChangeSelectedHeroDown()
@@ -196,19 +201,20 @@ public class BattleManager : MonoBehaviour
             selectedHero = heroLeft;
         }
 
-        ValidateSelectedHero();
-    }
-
-    private void ValidateSelectedHero()
-    {
         if (!selectedHero.IsAvailableToAct()) {
-            ChangeSelectedHeroUp();
+            ChangeSelectedHeroDown();
             return;
         }
 
+        UpdateHeroSpotlightTargetAndStatsInfo();
+    }
+
+    private void UpdateHeroSpotlightTargetAndStatsInfo()
+    {
         heroSelectionSpotlight.SetTargetCharacter(selectedHero);
         battleStatsInfo.ChangeHeroStatsInfo(selectedHero.GetCharacterStats());
     }
+
     private void ChangeSelectedEnemyUp()
     {
         if (selectedEnemy == enemyMiddle) {
@@ -219,7 +225,12 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyMiddle;
         }
 
-        ValidateSelectedEnemy();
+        if (selectedEnemy.IsDead()) {
+            ChangeSelectedEnemyUp();
+            return;
+        }
+
+        UpdateEnemySpotlightTargetAndStatsInfo();
     }
 
     private void ChangeSelectedEnemyDown()
@@ -232,16 +243,16 @@ public class BattleManager : MonoBehaviour
             selectedEnemy = enemyLeft;
         }
 
-        ValidateSelectedEnemy();
-    }
-
-    private void ValidateSelectedEnemy()
-    {
         if (selectedEnemy.IsDead()) {
-            ChangeSelectedEnemyUp();
+            ChangeSelectedEnemyDown();
             return;
         }
 
+        UpdateEnemySpotlightTargetAndStatsInfo();
+    }
+
+    private void UpdateEnemySpotlightTargetAndStatsInfo()
+    {
         enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
         battleStatsInfo.ChangeEnemyStatsInfo(selectedEnemy.GetCharacterStats());
     }
