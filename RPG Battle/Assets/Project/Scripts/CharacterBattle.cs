@@ -9,6 +9,7 @@ public class CharacterBattle : MonoBehaviour
     [SerializeField] private AudioClip attackNormalAudioClip;
     [SerializeField] private AudioClip attackCritAudioClip;
     [SerializeField] private AudioClip dieAudioClip;
+    //public CameraShake cameraShake;
 
     private CharacterAnimation characterAnimation;
     private HealthBar healthBar;
@@ -127,12 +128,19 @@ public class CharacterBattle : MonoBehaviour
 
         var damage = (int)UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
         bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
+        float shakeMagnitude;
+        float shakeDuration;
         if (!isCritical) {
             audioSource.PlayOneShot(attackNormalAudioClip);
+            shakeDuration = .2f;
+            shakeMagnitude = .2f;
         } else {
             audioSource.PlayOneShot(attackCritAudioClip);
             damage = (int)(damage * 1.5);
+            shakeDuration = .4f;
+            shakeMagnitude = .4f;
         }
+        StartCoroutine(CameraShake.Shake(shakeDuration, shakeMagnitude));
         targetCharacterBattle.TakeDamage(damage);
         DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);
     }

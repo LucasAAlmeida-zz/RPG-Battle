@@ -246,6 +246,9 @@ public class BattleManager : MonoBehaviour
 
     private void OnHeroAttackComplete()
     {
+        heroSelectionSpotlight.gameObject.SetActive(false);
+        enemySelectionSpotlight.gameObject.SetActive(false);
+
         selectedHero.SpendTurn();
 
         if (enemyMiddle.IsDead() && enemyLeft.IsDead() && enemyRight.IsDead()) {
@@ -261,8 +264,6 @@ public class BattleManager : MonoBehaviour
             enemyLeft.TryRefreshTurn();
             enemyRight.TryRefreshTurn();
         }
-        heroSelectionSpotlight.gameObject.SetActive(false);
-        enemySelectionSpotlight.gameObject.SetActive(false);
     }
     #endregion
 
@@ -301,6 +302,9 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnemyAttackComplete(CharacterBattle attackingEnemy)
     {
+        heroSelectionSpotlight.gameObject.SetActive(true);
+        enemySelectionSpotlight.gameObject.SetActive(true);
+        
         attackingEnemy.SpendTurn();
 
         if (heroMiddle.IsDead() && heroLeft.IsDead() && heroRight.IsDead()) {
@@ -317,9 +321,6 @@ public class BattleManager : MonoBehaviour
             heroRight.TryRefreshTurn();
         }
         ChangeSelectedHeroUp();
-
-        heroSelectionSpotlight.gameObject.SetActive(true);
-        enemySelectionSpotlight.gameObject.SetActive(true);
     }
     #endregion
 
