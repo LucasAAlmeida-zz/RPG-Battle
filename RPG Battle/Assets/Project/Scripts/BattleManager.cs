@@ -10,6 +10,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private SelectionSpotlight heroSelectionSpotlight;
     [SerializeField] private SelectionSpotlight enemySelectionSpotlight;
     [SerializeField] private GameObject battleResultsWindow;
+    [SerializeField] private StatsInfo battleStatsInfo;
 
     CharacterBattle heroMiddle;
     CharacterBattle heroLeft;
@@ -206,8 +207,8 @@ public class BattleManager : MonoBehaviour
         }
 
         heroSelectionSpotlight.SetTargetCharacter(selectedHero);
+        battleStatsInfo.ChangeHeroStatsInfo(selectedHero.GetCharacterStats());
     }
-
     private void ChangeSelectedEnemyUp()
     {
         if (selectedEnemy == enemyMiddle) {
@@ -242,6 +243,7 @@ public class BattleManager : MonoBehaviour
         }
 
         enemySelectionSpotlight.SetTargetCharacter(selectedEnemy);
+        battleStatsInfo.ChangeEnemyStatsInfo(selectedEnemy.GetCharacterStats());
     }
 
     private void OnHeroAttackComplete()

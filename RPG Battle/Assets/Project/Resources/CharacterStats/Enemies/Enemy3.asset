@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88b7ac23fe36147448703b38bd8f3506, type: 3}
   m_Name: Enemy3
   m_EditorClassIdentifier: 
-  name: Enemy 3
+  name: Yellow Enemy
   color: {r: 1, g: 1, b: 0, a: 0}
   maxHealth: 1100
   power: 400

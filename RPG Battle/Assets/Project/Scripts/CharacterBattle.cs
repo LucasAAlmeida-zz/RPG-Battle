@@ -9,7 +9,6 @@ public class CharacterBattle : MonoBehaviour
     [SerializeField] private AudioClip attackNormalAudioClip;
     [SerializeField] private AudioClip attackCritAudioClip;
     [SerializeField] private AudioClip dieAudioClip;
-    //public CameraShake cameraShake;
 
     private CharacterAnimation characterAnimation;
     private HealthBar healthBar;
@@ -47,6 +46,11 @@ public class CharacterBattle : MonoBehaviour
 
         characterAnimation.PlayIdleAnimation();
         healthManager = new HealthManager(characterStats.maxHealth);
+    }
+
+    public CharacterStats GetCharacterStats()
+    {
+        return characterStats;
     }
 
     private void Update()
