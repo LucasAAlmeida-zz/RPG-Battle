@@ -9,7 +9,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Transform pfCharacterBattle;
     [SerializeField] private SelectionSpotlight heroSelectionSpotlight;
     [SerializeField] private SelectionSpotlight enemySelectionSpotlight;
-    [SerializeField] private GameObject battleResultsWindow;
+    [SerializeField] private GameObject battleResultsWindowGameObject;
     [SerializeField] private StatsInfo battleStatsInfo;
 
     CharacterBattle heroMiddle;
@@ -328,7 +328,10 @@ public class BattleManager : MonoBehaviour
 
     private void HandleBattleEnded(bool haveHeroesWon)
     {
-        battleResultsWindow.GetComponent<BattleResultsWindow>().ChangeBattleResultsText(haveHeroesWon);
-        battleResultsWindow.SetActive(true);
+        Camera.main.gameObject.GetComponent<AudioSource>().Pause();
+        battleResultsWindowGameObject.SetActive(true);
+        var battleResultsWindow = battleResultsWindowGameObject.GetComponent<BattleResultsWindow>();
+        battleResultsWindow.ChangeBattleResultsText(haveHeroesWon);
+        battleResultsWindow.PlayBattleEndMusic(haveHeroesWon);
     }
 }

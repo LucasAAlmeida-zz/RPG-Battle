@@ -151,7 +151,7 @@ public class CharacterBattle : MonoBehaviour
 
     private void MoveToPosition(Vector3 moveTargetPosition, Action onMoveComplete)
     {
-        audioSource.PlayOneShot(moveAudioClip);
+        audioSource.PlayOneShot(moveAudioClip, .2f);
 
         this.moveTargetPosition = moveTargetPosition;
         this.onMoveComplete = onMoveComplete;
