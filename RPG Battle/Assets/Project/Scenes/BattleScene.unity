@@ -2731,6 +2731,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e75babe34559c847a3c7a277833448b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heroNameText: {fileID: 0}
+  heroMaxHealthText: {fileID: 0}
+  heroCritChanceText: {fileID: 0}
+  heroPowerText: {fileID: 0}
+  heroAccuracyText: {fileID: 0}
+  enemyNameText: {fileID: 0}
+  enemyMaxHealthText: {fileID: 0}
+  enemyCritChanceText: {fileID: 0}
+  enemyPowerText: {fileID: 0}
+  enemyAccuracyText: {fileID: 0}
 --- !u!1 &1426458238
 GameObject:
   m_ObjectHideFlags: 0
@@ -4000,6 +4010,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e75babe34559c847a3c7a277833448b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heroNameText: {fileID: 459664051}
+  heroMaxHealthText: {fileID: 2021910669}
+  heroCritChanceText: {fileID: 751632345}
+  heroPowerText: {fileID: 1079794872}
+  heroAccuracyText: {fileID: 1426458240}
+  enemyNameText: {fileID: 127209042}
+  enemyMaxHealthText: {fileID: 796585963}
+  enemyCritChanceText: {fileID: 12682158}
+  enemyPowerText: {fileID: 141891915}
+  enemyAccuracyText: {fileID: 1613416945}
 --- !u!1 &1949173817
 GameObject:
   m_ObjectHideFlags: 0

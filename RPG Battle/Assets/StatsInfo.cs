@@ -3,32 +3,17 @@ using TMPro;
 
 public class StatsInfo : MonoBehaviour
 {
-    private TextMeshProUGUI heroNameText;
-    private TextMeshProUGUI heroMaxHealthText;
-    private TextMeshProUGUI heroCritChanceText;
-    private TextMeshProUGUI heroPowerText;
-    private TextMeshProUGUI heroAccuracyText;
-    
-    private TextMeshProUGUI enemyNameText;
-    private TextMeshProUGUI enemyMaxHealthText;
-    private TextMeshProUGUI enemyCritChanceText;
-    private TextMeshProUGUI enemyPowerText;
-    private TextMeshProUGUI enemyAccuracyText;
+    [SerializeField] private TextMeshProUGUI heroNameText;
+    [SerializeField] private TextMeshProUGUI heroMaxHealthText;
+    [SerializeField] private TextMeshProUGUI heroCritChanceText;
+    [SerializeField] private TextMeshProUGUI heroPowerText;
+    [SerializeField] private TextMeshProUGUI heroAccuracyText;
 
-    private void Awake()
-    {
-        heroNameText = transform.Find("HeroSide/NameText").GetComponent<TextMeshProUGUI>();
-        heroMaxHealthText = transform.Find("HeroSide/MaxHealthText").GetComponent<TextMeshProUGUI>();
-        heroCritChanceText = transform.Find("HeroSide/CritChanceText").GetComponent<TextMeshProUGUI>();
-        heroPowerText = transform.Find("HeroSide/PowerText").GetComponent<TextMeshProUGUI>();
-        heroAccuracyText = transform.Find("HeroSide/AccuracyText").GetComponent<TextMeshProUGUI>();
-
-        enemyNameText = transform.Find("EnemySide/NameText").GetComponent<TextMeshProUGUI>();
-        enemyMaxHealthText = transform.Find("EnemySide/MaxHealthText").GetComponent<TextMeshProUGUI>();
-        enemyCritChanceText = transform.Find("EnemySide/CritChanceText").GetComponent<TextMeshProUGUI>();
-        enemyPowerText = transform.Find("EnemySide/PowerText").GetComponent<TextMeshProUGUI>();
-        enemyAccuracyText = transform.Find("EnemySide/AccuracyText").GetComponent<TextMeshProUGUI>();
-    }
+    [SerializeField] private TextMeshProUGUI enemyNameText;
+    [SerializeField] private TextMeshProUGUI enemyMaxHealthText;
+    [SerializeField] private TextMeshProUGUI enemyCritChanceText;
+    [SerializeField] private TextMeshProUGUI enemyPowerText;
+    [SerializeField] private TextMeshProUGUI enemyAccuracyText;
 
     public void ChangeHeroStatsInfo(CharacterStats heroStats)
     {
