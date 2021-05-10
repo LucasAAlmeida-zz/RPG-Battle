@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class AssetManager : MonoBehaviour
 {
-    public static AssetManager i { get; private set; }
-
-    public Material hero1Material;
-    public Material enemy1Material;
     public Transform damagePopup;
+
+    public static AssetManager i;
 
     private void Awake()
     {

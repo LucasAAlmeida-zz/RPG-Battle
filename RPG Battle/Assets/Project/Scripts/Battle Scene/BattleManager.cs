@@ -38,9 +38,6 @@ public class BattleManager : MonoBehaviour
         SpawnEnemyTeam();
 
         state = State.HeroesTurn;
-
-        ChangeSelectedHeroUp();
-        ChangeSelectedEnemyUp();
     }
 
     #region Spawn Characters
@@ -57,6 +54,8 @@ public class BattleManager : MonoBehaviour
         heroMiddle = SpawnCharacter(heroMiddlePos, heroTeamStats[0]);
         heroLeft = SpawnCharacter(heroLeftPos, heroTeamStats[1]);
         heroRight = SpawnCharacter(heroRightPos, heroTeamStats[2]);
+
+        ChangeSelectedHeroUp();
     }
     private List<CharacterStats> GetHeroTeamStats()
     {
@@ -67,14 +66,13 @@ public class BattleManager : MonoBehaviour
     }
     private List<CharacterStats> CreateRandomHeroTeam()
     {
-        var heroesStats = new CharacterStats[4] {
-            Resources.Load("CharacterStats/Heroes/Hero1") as CharacterStats,
-            Resources.Load("CharacterStats/Heroes/Hero2") as CharacterStats,
-            Resources.Load("CharacterStats/Heroes/Hero3") as CharacterStats,
-            Resources.Load("CharacterStats/Heroes/HeroBoss") as CharacterStats,
+        var heroesStatsList = new List<CharacterStats> {
+            Resources.Load("CharacterStats/Heroes/RedHero") as CharacterStats,
+            Resources.Load("CharacterStats/Heroes/GreenHero") as CharacterStats,
+            Resources.Load("CharacterStats/Heroes/BlueHero") as CharacterStats,
+            Resources.Load("CharacterStats/Heroes/BlackHero") as CharacterStats
         };
-
-        return CreateRandomTeam(heroesStats);
+        return CreateRandomTeam(heroesStatsList);
     }
     #endregion
 
@@ -90,35 +88,37 @@ public class BattleManager : MonoBehaviour
         enemyMiddle = SpawnCharacter(enemyMiddlePos, enemyTeamStats[0]);
         enemyLeft = SpawnCharacter(enemyLeftPos, enemyTeamStats[1]);
         enemyRight = SpawnCharacter(enemyRightPos, enemyTeamStats[2]);
+
+        ChangeSelectedEnemyUp();
     }
     private List<CharacterStats> CreateRandomEnemyTeam()
     {
-        var enemiesStats = new CharacterStats[4] {
-            Resources.Load("CharacterStats/Enemies/Enemy1") as CharacterStats,
-            Resources.Load("CharacterStats/Enemies/Enemy2") as CharacterStats,
-            Resources.Load("CharacterStats/Enemies/Enemy3") as CharacterStats,
-            Resources.Load("CharacterStats/Enemies/EnemyBoss") as CharacterStats,
+        var enemiesStatsList = new List<CharacterStats> {
+            Resources.Load("CharacterStats/Enemies/CyanEnemy") as CharacterStats,
+            Resources.Load("CharacterStats/Enemies/MagentaEnemy") as CharacterStats,
+            Resources.Load("CharacterStats/Enemies/YellowEnemy") as CharacterStats,
+            Resources.Load("CharacterStats/Enemies/WhiteEnemy") as CharacterStats
         };
-
-        return CreateRandomTeam(enemiesStats);
+        return CreateRandomTeam(enemiesStatsList);
     }
     #endregion
 
-    private static List<CharacterStats> CreateRandomTeam(CharacterStats[] characterStatsList)
+    private static List<CharacterStats> CreateRandomTeam(List<CharacterStats> characterStatsList)
     {
         var characterTeam = new List<CharacterStats>();
+        CharacterStats characterStats;
 
-        var characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Count)];
         characterTeam.Add(characterStats);
+        characterStatsList.Remove(characterStats);
 
-        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Count)];
         characterTeam.Add(characterStats);
+        characterStatsList.Remove(characterStats);
 
-        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Length)];
-        characterStatsList = characterStatsList.Where(h => h != characterStats).ToArray();
+        characterStats = characterStatsList[UnityEngine.Random.Range(0, characterStatsList.Count)];
         characterTeam.Add(characterStats);
+        characterStatsList.Remove(characterStats);
 
         return characterTeam;
     }
@@ -163,14 +163,17 @@ public class BattleManager : MonoBehaviour
             ChangeSelectedEnemyDown();
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            if (selectedHero.IsAvailableToAct() && !selectedEnemy.IsDead()) {
-                state = State.Busy;
-                selectedHero.Attack(selectedEnemy, () => {
-                    OnHeroAttackComplete();
-                });
-            }
+        if (Input.GetKeyDown(KeyCode.Space) && AttackIsPossible()) {
+            state = State.Busy;
+            selectedHero.Attack(selectedEnemy, () => {
+                OnHeroAttackComplete();
+            });
         }
+    }
+
+    private bool AttackIsPossible()
+    {
+        return selectedHero.IsAvailableToAct() && !selectedEnemy.IsDead();
     }
 
     private void ChangeSelectedHeroUp()
@@ -294,23 +297,32 @@ public class BattleManager : MonoBehaviour
 
     private CharacterBattle ChooseAttackingEnemy()
     {
-        var enemies = new CharacterBattle[3] { enemyMiddle, enemyLeft, enemyRight };
-        CharacterBattle attackingEnemy;
-        do {
-            attackingEnemy = enemies[UnityEngine.Random.Range(0, 3)];
-        } while (!attackingEnemy.IsAvailableToAct());
-        return attackingEnemy;
+        var availableEnemies = new List<CharacterBattle>();
+        if (enemyMiddle.IsAvailableToAct()) {
+            availableEnemies.Add(enemyMiddle);
+        }
+        if (enemyLeft.IsAvailableToAct()) {
+            availableEnemies.Add(enemyLeft);
+        }
+        if (enemyRight.IsAvailableToAct()) {
+            availableEnemies.Add(enemyRight);
+        }
+        return availableEnemies[UnityEngine.Random.Range(0, availableEnemies.Count)];
     }
 
     private CharacterBattle ChooseAttackedHero()
     {
-        var heroes = new CharacterBattle[3] { heroMiddle, heroLeft, heroRight };
-        CharacterBattle attackedHero;
-
-        do {
-            attackedHero = heroes[UnityEngine.Random.Range(0, 3)];
-        } while (attackedHero.IsDead());
-        return attackedHero;
+        var aliveHeroes = new List<CharacterBattle>();
+        if (!heroMiddle.IsDead()) {
+            aliveHeroes.Add(heroMiddle);
+        }
+        if (!heroLeft.IsDead()) {
+            aliveHeroes.Add(heroLeft);
+        }
+        if (!heroRight.IsDead()) {
+            aliveHeroes.Add(heroRight);
+        }
+        return aliveHeroes[UnityEngine.Random.Range(0, aliveHeroes.Count)];
     }
 
     private void OnEnemyAttackComplete(CharacterBattle attackingEnemy)

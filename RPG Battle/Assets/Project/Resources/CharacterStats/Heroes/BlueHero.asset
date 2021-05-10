@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 88b7ac23fe36147448703b38bd8f3506, type: 3}
-  m_Name: Enemy2
+  m_Name: BlueHero
   m_EditorClassIdentifier: 
-  name: Magenta Enemy
-  color: {r: 1, g: 0, b: 1, a: 0}
-  maxHealth: 900
-  power: 250
-  critChance: 35
-  accuracy: 95
+  name: Blue Hero
+  color: {r: 0, g: 0, b: 1, a: 0}
+  maxHealth: 1100
+  power: 400
+  critChance: 15
+  accuracy: 80

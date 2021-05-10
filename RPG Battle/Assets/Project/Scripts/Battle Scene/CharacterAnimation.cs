@@ -22,7 +22,7 @@ public class CharacterAnimation : MonoBehaviour
         Debug.Log("Idle animation");
     }
 
-    public void PlayAttackAnimation(Vector3 attackDirection)
+    public void PlayAttackAnimation()
     {
         Debug.Log("Attack animation");
     }

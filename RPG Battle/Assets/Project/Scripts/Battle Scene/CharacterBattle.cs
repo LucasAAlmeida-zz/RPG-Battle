@@ -119,31 +119,39 @@ public class CharacterBattle : MonoBehaviour
 
     private void HandleAttack(CharacterBattle targetCharacterBattle)
     {
-        var attackDirection = (targetCharacterBattle.GetPosition() - GetPosition()).normalized;
-        characterAnimation.PlayAttackAnimation(attackDirection);
+        characterAnimation.PlayAttackAnimation();
 
         bool hasHit = UnityEngine.Random.Range(0, 100) < characterStats.accuracy;
-
         if (!hasHit) {
-            audioSource.PlayOneShot(attackMissAudioClip);
-            DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
+            HandleMiss(targetCharacterBattle);
             return;
         }
 
+        HandleHit(targetCharacterBattle);
+    }
+
+    private void HandleMiss(CharacterBattle targetCharacterBattle)
+    {
+        audioSource.PlayOneShot(attackMissAudioClip);
+        DamagePopup.Create(targetCharacterBattle.GetPosition(), "Miss");
+    }
+
+    private void HandleHit(CharacterBattle targetCharacterBattle)
+    {
         var damage = (int)UnityEngine.Random.Range(characterStats.power * 0.9f, characterStats.power * 1.1f);
+        var audioClip = attackNormalAudioClip;
+        var shakeMagnitude = .2f;
+        var shakeDuration = .2f;
+
         bool isCritical = UnityEngine.Random.Range(0, 100) < characterStats.critChance;
-        float shakeMagnitude;
-        float shakeDuration;
-        if (!isCritical) {
-            audioSource.PlayOneShot(attackNormalAudioClip);
-            shakeDuration = .2f;
-            shakeMagnitude = .2f;
-        } else {
-            audioSource.PlayOneShot(attackCritAudioClip);
+        if (isCritical) {
             damage = (int)(damage * 1.5);
+            audioClip = attackCritAudioClip;
             shakeDuration = .4f;
             shakeMagnitude = .4f;
         }
+
+        audioSource.PlayOneShot(audioClip);
         StartCoroutine(CameraShake.Shake(shakeDuration, shakeMagnitude));
         targetCharacterBattle.TakeDamage(damage);
         DamagePopup.Create(targetCharacterBattle.GetPosition(), damage.ToString(), isCritical);

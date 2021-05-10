@@ -12,7 +12,7 @@ public class HeroTeam : MonoBehaviour
     CharacterStats redHeroStats;
     CharacterStats greenHeroStats;
     CharacterStats blueHeroStats;
-    CharacterStats whiteHeroStats;
+    CharacterStats blackHeroStats;
 
     private void Awake()
     {
@@ -22,10 +22,10 @@ public class HeroTeam : MonoBehaviour
 
             heroTeam = new List<CharacterStats>();
 
-            redHeroStats = Resources.Load("CharacterStats/Heroes/Hero1") as CharacterStats;
-            greenHeroStats = Resources.Load("CharacterStats/Heroes/Hero2") as CharacterStats;
-            blueHeroStats = Resources.Load("CharacterStats/Heroes/Hero3") as CharacterStats;
-            whiteHeroStats = Resources.Load("CharacterStats/Heroes/HeroBoss") as CharacterStats;
+            redHeroStats = Resources.Load("CharacterStats/Heroes/RedHero") as CharacterStats;
+            greenHeroStats = Resources.Load("CharacterStats/Heroes/GreenHero") as CharacterStats;
+            blueHeroStats = Resources.Load("CharacterStats/Heroes/BlueHero") as CharacterStats;
+            blackHeroStats = Resources.Load("CharacterStats/Heroes/BlackHero") as CharacterStats;
         }
     }
 
@@ -41,29 +41,29 @@ public class HeroTeam : MonoBehaviour
     {
         return blueHeroStats;
     }
-    public CharacterStats GetWhiteHeroStats()
+    public CharacterStats GetBlackHeroStats()
     {
-        return whiteHeroStats;
+        return blackHeroStats;
     }
 
-    public int AddRedCharacterToTeam()
+    public int AddRedHeroToTeam()
     {
-        return AddCharacterToTeam(redHeroStats);
+        return AddHeroToTeam(redHeroStats);
     }
-    public int AddGreenCharacterToTeam()
+    public int AddGreenHeroToTeam()
     {
-        return AddCharacterToTeam(greenHeroStats);
+        return AddHeroToTeam(greenHeroStats);
     }
-    public int AddBlueCharacterToTeam()
+    public int AddBlueHeroToTeam()
     {
-        return AddCharacterToTeam(blueHeroStats);
+        return AddHeroToTeam(blueHeroStats);
     }
-    public int AddWhiteCharacterToTeam()
+    public int AddBlackHeroToTeam()
     {
-        return AddCharacterToTeam(whiteHeroStats);
+        return AddHeroToTeam(blackHeroStats);
     }
 
-    private int AddCharacterToTeam(CharacterStats characterStats)
+    private int AddHeroToTeam(CharacterStats characterStats)
     {
         heroTeam.Add(characterStats);
 

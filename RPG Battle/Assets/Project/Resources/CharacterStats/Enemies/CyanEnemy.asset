@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 88b7ac23fe36147448703b38bd8f3506, type: 3}
-  m_Name: Enemy1
+  m_Name: CyanEnemy
   m_EditorClassIdentifier: 
   name: Cyan Enemy
   color: {r: 0, g: 1, b: 1, a: 0}

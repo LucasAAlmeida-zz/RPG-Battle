@@ -8,16 +8,16 @@ public class SelectTeamWindow : MonoBehaviour
 {
     private AudioSource audioSource;
 
-    [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private TextMeshProUGUI maxHealthText;
-    [SerializeField] private TextMeshProUGUI powerText;
-    [SerializeField] private TextMeshProUGUI critChanceText;
-    [SerializeField] private TextMeshProUGUI accuracyText;
+    private TextMeshProUGUI nameText;
+    private TextMeshProUGUI maxHealthText;
+    private TextMeshProUGUI powerText;
+    private TextMeshProUGUI critChanceText;
+    private TextMeshProUGUI accuracyText;
 
     [SerializeField] private GameObject redHeroPositionTextGameObject;
     [SerializeField] private GameObject greenHeroPositionTextGameObject;
     [SerializeField] private GameObject blueHeroPositionTextGameObject;
-    [SerializeField] private GameObject whiteHeroPositionTextGameObject;
+    [SerializeField] private GameObject blackHeroPositionTextGameObject;
 
     [SerializeField] private AudioClip showHeroStatsAudioClip;
     [SerializeField] private AudioClip heroSelectedAudioClip;
@@ -25,6 +25,12 @@ public class SelectTeamWindow : MonoBehaviour
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+
+        nameText = transform.Find("HeroStatsInfo/NameText").GetComponent<TextMeshProUGUI>();
+        maxHealthText = transform.Find("HeroStatsInfo/MaxHealthText").GetComponent<TextMeshProUGUI>();
+        powerText = transform.Find("HeroStatsInfo/PowerText").GetComponent<TextMeshProUGUI>();
+        critChanceText = transform.Find("HeroStatsInfo/CritChanceText").GetComponent<TextMeshProUGUI>();
+        accuracyText = transform.Find("HeroStatsInfo/AccuracyText").GetComponent<TextMeshProUGUI>();
     }
 
     public void RedHeroButtonMouseEnter()
@@ -39,9 +45,9 @@ public class SelectTeamWindow : MonoBehaviour
     {
         DisplayHeroStats(HeroTeam.i.GetBlueHeroStats());
     }
-    public void WhiteHeroButtonMouseEnter()
+    public void BlackHeroButtonMouseEnter()
     {
-        DisplayHeroStats(HeroTeam.i.GetWhiteHeroStats());
+        DisplayHeroStats(HeroTeam.i.GetBlackHeroStats());
     }
 
     private void DisplayHeroStats(CharacterStats heroStats)
@@ -58,7 +64,7 @@ public class SelectTeamWindow : MonoBehaviour
     public void RedHeroClicked()
     {
         if (!redHeroPositionTextGameObject.activeSelf) {
-            var position = HeroTeam.i.AddRedCharacterToTeam();
+            var position = HeroTeam.i.AddRedHeroToTeam();
             HeroSelected(redHeroPositionTextGameObject, position);
         }
         
@@ -66,7 +72,7 @@ public class SelectTeamWindow : MonoBehaviour
     public void GreenHeroClicked()
     {
         if (!greenHeroPositionTextGameObject.activeSelf) {
-            var position = HeroTeam.i.AddGreenCharacterToTeam();
+            var position = HeroTeam.i.AddGreenHeroToTeam();
             HeroSelected(greenHeroPositionTextGameObject, position);
         }
     }
@@ -74,15 +80,15 @@ public class SelectTeamWindow : MonoBehaviour
     public void BlueHeroClicked()
     {
         if (!blueHeroPositionTextGameObject.activeSelf) {
-            var position = HeroTeam.i.AddBlueCharacterToTeam();
+            var position = HeroTeam.i.AddBlueHeroToTeam();
             HeroSelected(blueHeroPositionTextGameObject, position);
         }
     }
-    public void WhiteHeroClicked()
+    public void BlackHeroClicked()
     {
-        if (!whiteHeroPositionTextGameObject.activeSelf) {
-            var position = HeroTeam.i.AddWhiteCharacterToTeam();
-            HeroSelected(whiteHeroPositionTextGameObject, position);
+        if (!blackHeroPositionTextGameObject.activeSelf) {
+            var position = HeroTeam.i.AddBlackHeroToTeam();
+            HeroSelected(blackHeroPositionTextGameObject, position);
         }
     }
 
